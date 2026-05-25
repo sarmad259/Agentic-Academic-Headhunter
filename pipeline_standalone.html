@@ -1,0 +1,350 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Professor Outreach System — Pipeline</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;background:#0d0f1a;color:#e2e8f0;min-height:100vh;padding:32px 24px}
+:root{--blue:#3b82f6;--green:#22c55e;--yellow:#eab308;--red:#ef4444;--purple:#a855f7;--cyan:#06b6d4;--orange:#f97316;--border:#1e2235;--card:#131625;--card2:#1a1d2e}
+
+h1{text-align:center;font-size:1.5rem;font-weight:700;color:#fff;margin-bottom:6px}
+.subtitle{text-align:center;color:#64748b;font-size:0.85rem;margin-bottom:40px}
+
+/* Pipeline container */
+.pipeline{display:flex;flex-direction:column;gap:0;max-width:1100px;margin:0 auto}
+
+/* Phase block */
+.phase{background:var(--card2);border:1px solid var(--border);border-radius:14px;padding:24px 28px;position:relative}
+.phase-label{display:inline-flex;align-items:center;gap:8px;font-size:0.72rem;font-weight:600;text-transform:uppercase;letter-spacing:.1em;padding:4px 12px;border-radius:20px;margin-bottom:16px}
+.phase-title{font-size:1.05rem;font-weight:600;color:#fff;margin-bottom:4px}
+.phase-cmd{font-size:0.78rem;color:#475569;font-family:monospace;margin-bottom:18px}
+
+/* Arrow between phases */
+.arrow{display:flex;justify-content:center;align-items:center;height:40px;color:#334155;font-size:1.4rem}
+
+/* Node grid */
+.nodes{display:flex;gap:12px;flex-wrap:wrap;align-items:flex-start}
+.node{background:#0f1120;border:1px solid var(--border);border-radius:10px;padding:14px 16px;flex:1;min-width:160px;position:relative}
+.node-icon{font-size:1.4rem;margin-bottom:6px}
+.node-title{font-size:0.82rem;font-weight:600;color:#e2e8f0;margin-bottom:4px}
+.node-desc{font-size:0.72rem;color:#64748b;line-height:1.5}
+.node-tag{display:inline-block;padding:2px 7px;border-radius:4px;font-size:0.68rem;font-weight:500;margin-top:6px}
+
+/* Node arrow */
+.node-arrow{display:flex;align-items:center;color:#334155;font-size:1rem;padding-top:20px;flex-shrink:0}
+
+/* Agent crew */
+.crew{display:flex;gap:0;align-items:stretch;flex-wrap:wrap}
+.agent{background:#0f1120;border:1px solid var(--border);border-radius:10px;padding:14px 16px;flex:1;min-width:140px}
+.agent-role{font-size:0.7rem;font-weight:600;text-transform:uppercase;letter-spacing:.06em;margin-bottom:6px}
+.agent-name{font-size:0.85rem;font-weight:600;color:#e2e8f0;margin-bottom:4px}
+.agent-does{font-size:0.72rem;color:#64748b;line-height:1.5}
+.agent-sep{display:flex;align-items:center;color:#334155;padding:0 4px;font-size:1rem}
+
+/* Checklist */
+.checklist{display:grid;grid-template-columns:1fr 1fr;gap:6px;margin-top:12px}
+.check-item{display:flex;align-items:flex-start;gap:6px;font-size:0.75rem;color:#94a3b8;background:#0f1120;padding:7px 10px;border-radius:7px;border:1px solid var(--border)}
+.check-item .icon{color:var(--green);flex-shrink:0;margin-top:1px}
+
+/* LLM stack */
+.llm-stack{display:flex;gap:10px;flex-wrap:wrap}
+.llm-card{background:#0f1120;border:1px solid var(--border);border-radius:10px;padding:12px 16px;flex:1;min-width:180px}
+.llm-name{font-size:0.85rem;font-weight:600;margin-bottom:3px}
+.llm-desc{font-size:0.72rem;color:#64748b}
+.llm-badge{font-size:0.68rem;padding:2px 8px;border-radius:10px;margin-top:6px;display:inline-block}
+
+/* Data flow */
+.dataflow{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}
+.df-item{background:#0f1120;border:1px solid var(--border);border-radius:8px;padding:12px}
+.df-file{font-size:0.78rem;font-weight:600;font-family:monospace;margin-bottom:4px}
+.df-desc{font-size:0.7rem;color:#64748b}
+
+/* Colors */
+.blue{background:#1e3a5f;color:#93c5fd}.green{background:#14532d;color:#86efac}
+.yellow{background:#713f12;color:#fde68a}.purple{background:#3b0764;color:#d8b4fe}
+.cyan{background:#164e63;color:#67e8f9}.orange{background:#7c2d12;color:#fed7aa}
+.red{background:#450a0a;color:#fca5a5}
+
+.phase-0 .phase-label{background:#1e3a5f;color:#93c5fd}
+.phase-1 .phase-label{background:#3b0764;color:#d8b4fe}
+.phase-2 .phase-label{background:#713f12;color:#fde68a}
+.phase-3 .phase-label{background:#14532d;color:#86efac}
+.phase-4 .phase-label{background:#164e63;color:#67e8f9}
+.phase-5 .phase-label{background:#1e2235;color:#94a3b8}
+
+.stat-row{display:flex;gap:12px;flex-wrap:wrap;margin-bottom:16px}
+.stat{background:#0f1120;border:1px solid var(--border);border-radius:8px;padding:10px 16px;text-align:center;flex:1;min-width:100px}
+.stat .n{font-size:1.4rem;font-weight:700;color:var(--blue)}
+.stat .l{font-size:0.7rem;color:#64748b;margin-top:2px}
+
+.back-btn{display:inline-flex;align-items:center;gap:6px;background:#1e2235;color:#94a3b8;padding:8px 16px;border-radius:8px;text-decoration:none;font-size:0.82rem;margin-bottom:24px;transition:all .15s}
+.back-btn:hover{background:#263045;color:#e2e8f0}
+
+.mode-tabs{display:flex;gap:8px;margin-bottom:14px;flex-wrap:wrap}
+.mode-tab{background:#0f1120;border:1px solid var(--border);border-radius:8px;padding:8px 14px;font-size:0.78rem;cursor:pointer;transition:all .15s}
+.mode-tab.active{border-color:var(--purple);color:#d8b4fe;background:#1a0a2e}
+</style>
+</head>
+<body>
+
+<a href="#" class="back-btn" style="visibility:hidden">← Back</a>
+
+<h1>🎓 Professor Outreach System</h1>
+<p class="subtitle">Muhammad Sarmad Khan — Agentic AI Pipeline for PhD Scholarship Outreach</p>
+
+<div class="pipeline">
+
+  <!-- Stats -->
+  <div class="stat-row">
+    <div class="stat"><div class="n">205</div><div class="l">Universities</div></div>
+    <div class="stat"><div class="n">28</div><div class="l">Regions</div></div>
+    <div class="stat"><div class="n">400</div><div class="l">Target Professors</div></div>
+    <div class="stat"><div class="n">8</div><div class="l">Quality Checks</div></div>
+    <div class="stat"><div class="n">3</div><div class="l">AI Models</div></div>
+    <div class="stat"><div class="n">4</div><div class="l">Agents (CrewAI)</div></div>
+  </div>
+
+  <!-- Phase 0: Discovery -->
+  <div class="phase phase-0">
+    <div class="phase-label">Phase 0</div>
+    <div class="phase-title">Professor Discovery</div>
+    <div class="phase-cmd">$ python main.py discover</div>
+
+    <div class="nodes">
+      <div class="node">
+        <div class="node-icon">🌍</div>
+        <div class="node-title">205 Universities</div>
+        <div class="node-desc">USA, Germany, UK, Japan, China, Canada, Australia, Turkey, Switzerland + 19 more regions</div>
+        <span class="node-tag blue">QS Rankings</span>
+      </div>
+      <div class="node-arrow">×</div>
+      <div class="node">
+        <div class="node-icon">🔬</div>
+        <div class="node-title">10 Research Areas</div>
+        <div class="node-desc">Medical imaging, attention mechanisms, knowledge distillation, LLMs, RAG, AI safety, CV, NLP...</div>
+        <span class="node-tag purple">Sarmad's Profile</span>
+      </div>
+      <div class="node-arrow">→</div>
+      <div class="node">
+        <div class="node-icon">📡</div>
+        <div class="node-title">Semantic Scholar API</div>
+        <div class="node-desc">2,050 searches. 2s rate limit between calls. Authenticated key for higher limits.</div>
+        <span class="node-tag cyan">Free API</span>
+      </div>
+      <div class="node-arrow">→</div>
+      <div class="node">
+        <div class="node-icon">🎓</div>
+        <div class="node-title">Faculty Filter</div>
+        <div class="node-desc">Professor + Associate Professor only. h-index ≥ 10, citations ≥ 500. No assistants or PhD students.</div>
+        <span class="node-tag yellow">Quality Gate</span>
+      </div>
+    </div>
+
+    <div style="margin-top:14px;display:flex;gap:12px;flex-wrap:wrap">
+      <div class="node" style="flex:1;min-width:200px">
+        <div class="node-icon">📊</div>
+        <div class="node-title">Matching Engine (0–100)</div>
+        <div class="node-desc">Scores each professor against Sarmad's SCDA/DDA research, medical imaging background, and skills. Ranks top 400.</div>
+        <span class="node-tag green">Match Score</span>
+      </div>
+      <div class="node-arrow">→</div>
+      <div class="node" style="flex:1;min-width:200px">
+        <div class="node-icon">🕸️</div>
+        <div class="node-title">Semantic Graph</div>
+        <div class="node-desc">RDF-style triples: professor→lab, professor→research_area, professor→same_lab_as. Used for follow-up routing.</div>
+        <span class="node-tag purple">graph.json</span>
+      </div>
+      <div class="node-arrow">→</div>
+      <div class="node" style="flex:1;min-width:200px">
+        <div class="node-icon">💾</div>
+        <div class="node-title">targets.json</div>
+        <div class="node-desc">400 ranked professors saved with name, institution, country, match score, research keywords, author ID.</div>
+        <span class="node-tag blue">Output</span>
+      </div>
+    </div>
+  </div>
+
+  <div class="arrow">↓</div>
+
+  <!-- Phase 1: Draft -->
+  <div class="phase phase-1">
+    <div class="phase-label">Phase 1</div>
+    <div class="phase-title">Email Draft Generation</div>
+    <div class="phase-cmd">$ python main.py draft --crew &nbsp;|&nbsp; draft &nbsp;|&nbsp; draft --groq</div>
+
+    <div class="mode-tabs">
+      <div class="mode-tab active" onclick="showMode('crew',this)">🤖 CrewAI (Best Quality)</div>
+      <div class="mode-tab" onclick="showMode('langgraph',this)">🔗 LangGraph (Precise)</div>
+      <div class="mode-tab" onclick="showMode('groq',this)">⚡ Groq Direct (Fastest)</div>
+    </div>
+
+    <!-- CrewAI mode -->
+    <div id="mode-crew">
+      <div class="crew">
+        <div class="agent">
+          <div class="agent-role" style="color:#93c5fd">Agent 1</div>
+          <div class="agent-name">🔍 Researcher</div>
+          <div class="agent-does">Reads professor's papers. Extracts the EXACT technique name — not just "attention mechanism" but "Dual-Branch Spatial-Channel Attention".</div>
+        </div>
+        <div class="agent-sep">→</div>
+        <div class="agent">
+          <div class="agent-role" style="color:#d8b4fe">Agent 2</div>
+          <div class="agent-name">🎯 Matcher</div>
+          <div class="agent-does">Finds the strongest connection between professor's technique and Sarmad's SCDA/DDA work. Names both sides specifically.</div>
+        </div>
+        <div class="agent-sep">→</div>
+        <div class="agent">
+          <div class="agent-role" style="color:#86efac">Agent 3</div>
+          <div class="agent-name">✍️ Drafter</div>
+          <div class="agent-does">Writes the email. Under 180 words. References specific technique. Includes 97.22%, IELTS 7.0, October 2026, funding ask.</div>
+        </div>
+        <div class="agent-sep">→</div>
+        <div class="agent" style="border-color:#a855f7">
+          <div class="agent-role" style="color:#f0abfc">Agent 4</div>
+          <div class="agent-name">✅ Reviewer</div>
+          <div class="agent-does">Checks 8 criteria. If FAIL → gives EXACT prescriptive fix ("ADD: '97.22% accuracy'") → Drafter rewrites. Max 3 attempts.</div>
+        </div>
+      </div>
+
+      <!-- Self-refinement loop -->
+      <div style="margin-top:14px;background:#0f1120;border:1px solid #a855f7;border-radius:10px;padding:14px 16px">
+        <div style="font-size:0.78rem;font-weight:600;color:#d8b4fe;margin-bottom:8px">🔄 Self-Refinement Loop (Reflexion Pattern)</div>
+        <div style="font-size:0.75rem;color:#94a3b8;line-height:1.8">
+          Draft → Reviewer checks → <span style="color:#ef4444">FAIL</span>: "ADD '97.22% accuracy' in sentence 2" → Drafter gets exact fix → Retry → Reviewer checks → <span style="color:#22c55e">PASS</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- LangGraph mode -->
+    <div id="mode-langgraph" style="display:none">
+      <div class="nodes">
+        <div class="node"><div class="node-icon">📄</div><div class="node-title">Researcher Node</div><div class="node-desc">Fetches papers from Semantic Scholar using author_id</div></div>
+        <div class="node-arrow">→</div>
+        <div class="node"><div class="node-icon">🎯</div><div class="node-title">Matcher Node</div><div class="node-desc">Detects research angle from keywords + paper abstracts</div></div>
+        <div class="node-arrow">→</div>
+        <div class="node"><div class="node-icon">✍️</div><div class="node-title">Drafter Node</div><div class="node-desc">Generates email with context-aware prompt</div></div>
+        <div class="node-arrow">→</div>
+        <div class="node" style="border-color:#a855f7"><div class="node-icon">✅</div><div class="node-title">Reviewer Node</div><div class="node-desc">8-item check + prescriptive fixes + hard override</div></div>
+        <div class="node-arrow">→</div>
+        <div class="node"><div class="node-icon">🏁</div><div class="node-title">Finalizer Node</div><div class="node-desc">Adds signature + picks subject line</div></div>
+      </div>
+    </div>
+
+    <!-- Groq mode -->
+    <div id="mode-groq" style="display:none">
+      <div class="nodes">
+        <div class="node"><div class="node-icon">🎯</div><div class="node-title">Context Detection</div><div class="node-desc">Matches professor keywords to 10 research angle templates</div></div>
+        <div class="node-arrow">→</div>
+        <div class="node"><div class="node-icon">⚡</div><div class="node-title">Single LLM Call</div><div class="node-desc">Groq Llama-3.3-70b generates email in ~1 second</div></div>
+        <div class="node-arrow">→</div>
+        <div class="node"><div class="node-icon">💾</div><div class="node-title">Save Draft</div><div class="node-desc">Saved to /drafts as markdown with metadata</div></div>
+      </div>
+    </div>
+
+    <!-- Quality checklist -->
+    <div style="margin-top:16px">
+      <div style="font-size:0.78rem;font-weight:600;color:#94a3b8;margin-bottom:8px">8-ITEM QUALITY CHECKLIST (every email must pass)</div>
+      <div class="checklist">
+        <div class="check-item"><span class="icon">✓</span> Names professor's specific technique from paper</div>
+        <div class="check-item"><span class="icon">✓</span> Contains "SCDA" or "DDA"</div>
+        <div class="check-item"><span class="icon">✓</span> Contains 97.22% or +5.91% or 50%→96.9%</div>
+        <div class="check-item"><span class="icon">✓</span> Contains "IELTS 7.0"</div>
+        <div class="check-item"><span class="icon">✓</span> Contains "October 2026"</div>
+        <div class="check-item"><span class="icon">✓</span> Under 180 words</div>
+        <div class="check-item"><span class="icon">✓</span> No flattery, no GPA mention</div>
+        <div class="check-item"><span class="icon">✓</span> Clear ask for funded Masters/PhD</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="arrow">↓</div>
+
+  <!-- Phase 2: Human Review -->
+  <div class="phase phase-2">
+    <div class="phase-label">Phase 2</div>
+    <div class="phase-title">Human Review (Manual)</div>
+    <div class="phase-cmd">Review /drafts → move approved to /approved</div>
+    <div class="nodes">
+      <div class="node"><div class="node-icon">📁</div><div class="node-title">/drafts folder</div><div class="node-desc">Each draft is a .md file with professor details, referenced papers, match score, and email body.</div></div>
+      <div class="node-arrow">→</div>
+      <div class="node"><div class="node-icon">👁️</div><div class="node-title">You Review</div><div class="node-desc">Read each email. Edit if needed. Nothing sends automatically — full human control.</div></div>
+      <div class="node-arrow">→</div>
+      <div class="node"><div class="node-icon">✅</div><div class="node-title">/approved folder</div><div class="node-desc">Move approved drafts here. Or use the Dashboard to generate + send in one click.</div></div>
+    </div>
+  </div>
+
+  <div class="arrow">↓</div>
+
+  <!-- Phase 3: Send -->
+  <div class="phase phase-3">
+    <div class="phase-label">Phase 3</div>
+    <div class="phase-title">Email Sending</div>
+    <div class="phase-cmd">$ python main.py send</div>
+    <div class="nodes">
+      <div class="node"><div class="node-icon">📧</div><div class="node-title">Gmail SMTP</div><div class="node-desc">Sends from khansardarms@gmail.com via App Password. Works for any email address worldwide. No domain needed.</div><span class="node-tag green">Free</span></div>
+      <div class="node-arrow">→</div>
+      <div class="node"><div class="node-icon">📊</div><div class="node-title">Outreach Tracker</div><div class="node-desc">Records: professor name, lab, sent date, status. Updates targets.json. Moves draft to /sent.</div><span class="node-tag blue">outreach_tracker.json</span></div>
+      <div class="node-arrow">→</div>
+      <div class="node"><div class="node-icon">⏱️</div><div class="node-title">10-14 Day Rule</div><div class="node-desc">If no response after 10 days → system queues next professor in same lab. One email per lab at a time.</div><span class="node-tag yellow">Smart Follow-up</span></div>
+    </div>
+  </div>
+
+  <div class="arrow">↓</div>
+
+  <!-- Phase 4: Follow-up -->
+  <div class="phase phase-4">
+    <div class="phase-label">Phase 4</div>
+    <div class="phase-title">Follow-up & Lab Rotation</div>
+    <div class="phase-cmd">$ python main.py followup</div>
+    <div class="nodes">
+      <div class="node"><div class="node-icon">🕸️</div><div class="node-title">Semantic Graph</div><div class="node-desc">Knows which professors are in the same lab. If Prof A doesn't reply → contact Prof B in same lab next.</div></div>
+      <div class="node-arrow">→</div>
+      <div class="node"><div class="node-icon">🔄</div><div class="node-title">Lab Rotation</div><div class="node-desc">Never emails same lab twice simultaneously. Rotates through professors ranked by match score.</div></div>
+      <div class="node-arrow">→</div>
+      <div class="node"><div class="node-icon">📋</div><div class="node-title">Queue Next Draft</div><div class="node-desc">Adds next professor to draft queue. Run draft again to generate their personalized email.</div></div>
+    </div>
+  </div>
+
+  <div class="arrow">↓</div>
+
+  <!-- LLM Stack -->
+  <div class="phase phase-5">
+    <div class="phase-label">LLM Stack</div>
+    <div class="phase-title">AI Model Priority</div>
+    <div class="phase-cmd">Auto-selects best available model</div>
+    <div class="llm-stack">
+      <div class="llm-card" style="border-color:#3b82f6">
+        <div class="llm-name" style="color:#93c5fd">1. DeepSeek-V4-Flash</div>
+        <div class="llm-desc">284B params, 13B activated (MoE). 1M token context. Thinking mode for reviewer node.</div>
+        <span class="llm-badge blue">Ollama Cloud</span>
+      </div>
+      <div style="display:flex;align-items:center;color:#334155;padding:0 4px">↓ fallback</div>
+      <div class="llm-card" style="border-color:#a855f7">
+        <div class="llm-name" style="color:#d8b4fe">2. Qwen3.5-397B</div>
+        <div class="llm-desc">397B parameters via Ollama cloud. Strong reasoning, large context window.</div>
+        <span class="llm-badge purple">Ollama Cloud</span>
+      </div>
+      <div style="display:flex;align-items:center;color:#334155;padding:0 4px">↓ fallback</div>
+      <div class="llm-card" style="border-color:#22c55e">
+        <div class="llm-name" style="color:#86efac">3. Groq Llama-3.3-70b</div>
+        <div class="llm-desc">Always available. Free tier. 14,400 req/day. ~1 second response time.</div>
+        <span class="llm-badge green">Always Available</span>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<script>
+function showMode(mode, el) {
+  ['crew','langgraph','groq'].forEach(m => {
+    document.getElementById('mode-'+m).style.display = m===mode ? 'block' : 'none';
+  });
+  document.querySelectorAll('.mode-tab').forEach(t => t.classList.remove('active'));
+  el.classList.add('active');
+}
+</script>
+</body>
+</html>

@@ -1,0 +1,463 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Professor Outreach — Sarmad Khan</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;background:#0d0f1a;color:#e2e8f0;min-height:100vh}
+:root{--blue:#3b82f6;--green:#22c55e;--yellow:#eab308;--red:#ef4444;--purple:#a855f7;--border:#1e2235;--card:#131625;--card2:#1a1d2e}
+
+/* Layout */
+header{background:#131625;border-bottom:1px solid var(--border);padding:0 28px;display:flex;align-items:center;justify-content:space-between;height:56px;position:sticky;top:0;z-index:100}
+header h1{font-size:1rem;font-weight:600;color:#fff;display:flex;align-items:center;gap:8px}
+header h1 span{color:var(--blue)}
+.header-right{display:flex;align-items:center;gap:12px}
+.badge{background:#1e2235;color:#94a3b8;padding:4px 10px;border-radius:20px;font-size:0.75rem}
+
+.layout{display:grid;grid-template-columns:220px 1fr;min-height:calc(100vh - 56px)}
+nav{background:#0f1120;border-right:1px solid var(--border);padding:16px 0}
+nav a{display:flex;align-items:center;gap:10px;padding:10px 20px;color:#64748b;font-size:0.85rem;cursor:pointer;transition:all .15s;text-decoration:none;border-left:3px solid transparent}
+nav a:hover{color:#e2e8f0;background:#131625}
+nav a.active{color:#fff;background:#131625;border-left-color:var(--blue)}
+nav .nav-section{padding:16px 20px 6px;font-size:0.7rem;text-transform:uppercase;letter-spacing:.08em;color:#334155}
+main{padding:24px;overflow-y:auto}
+
+/* Stats row */
+.stats{display:grid;grid-template-columns:repeat(5,1fr);gap:12px;margin-bottom:24px}
+.stat{background:var(--card2);border:1px solid var(--border);border-radius:10px;padding:16px;text-align:center}
+.stat .n{font-size:1.8rem;font-weight:700;line-height:1}
+.stat .l{font-size:0.72rem;color:#64748b;margin-top:4px;text-transform:uppercase;letter-spacing:.05em}
+.stat.blue .n{color:var(--blue)}
+.stat.green .n{color:var(--green)}
+.stat.yellow .n{color:var(--yellow)}
+.stat.purple .n{color:var(--purple)}
+.stat.red .n{color:var(--red)}
+
+/* Toolbar */
+.toolbar{display:flex;gap:10px;margin-bottom:16px;flex-wrap:wrap;align-items:center}
+.toolbar select,.toolbar input{background:#131625;border:1px solid var(--border);color:#e2e8f0;padding:7px 12px;border-radius:7px;font-size:0.82rem;outline:none}
+.toolbar select:focus,.toolbar input:focus{border-color:var(--blue)}
+.btn{padding:7px 16px;border-radius:7px;border:none;cursor:pointer;font-size:0.82rem;font-weight:500;transition:all .15s}
+.btn-primary{background:var(--blue);color:#fff}.btn-primary:hover{background:#2563eb}
+.btn-success{background:#166534;color:#86efac}.btn-success:hover{background:#15803d}
+.btn-ghost{background:#1e2235;color:#94a3b8}.btn-ghost:hover{background:#263045;color:#e2e8f0}
+.btn-danger{background:#7f1d1d;color:#fca5a5}.btn-danger:hover{background:#991b1b}
+.btn-sm{padding:4px 10px;font-size:0.75rem}
+
+/* Table */
+.table-wrap{background:var(--card2);border:1px solid var(--border);border-radius:10px;overflow:hidden}
+table{width:100%;border-collapse:collapse;font-size:0.82rem}
+th{background:#0f1120;padding:10px 14px;text-align:left;color:#475569;font-weight:500;font-size:0.72rem;text-transform:uppercase;letter-spacing:.05em;border-bottom:1px solid var(--border)}
+td{padding:11px 14px;border-bottom:1px solid #0f1120;vertical-align:middle}
+tr:last-child td{border-bottom:none}
+tr:hover td{background:#0f1120}
+
+/* Badges */
+.score{display:inline-block;padding:2px 9px;border-radius:20px;font-weight:600;font-size:0.75rem}
+.score.h{background:#14532d;color:#86efac}.score.m{background:#713f12;color:#fde68a}.score.l{background:#450a0a;color:#fca5a5}
+.status-badge{display:inline-block;padding:2px 9px;border-radius:20px;font-size:0.72rem;font-weight:500}
+.s-pending{background:#1e2235;color:#94a3b8}
+.s-draft{background:#1e3a5f;color:#93c5fd}
+.s-emailed{background:#14532d;color:#86efac}
+.s-responded{background:#3b0764;color:#d8b4fe}
+.s-no-response{background:#450a0a;color:#fca5a5}
+.tag{display:inline-block;background:#1e2235;color:#94a3b8;padding:2px 7px;border-radius:4px;font-size:0.7rem;margin:1px}
+
+/* Kanban */
+.kanban{display:grid;grid-template-columns:repeat(4,1fr);gap:14px}
+.k-col{background:var(--card2);border:1px solid var(--border);border-radius:10px;padding:14px;min-height:300px}
+.k-col h3{font-size:0.72rem;text-transform:uppercase;letter-spacing:.06em;color:#64748b;margin-bottom:12px;display:flex;align-items:center;justify-content:space-between}
+.k-col h3 .cnt{background:#1e2235;color:#94a3b8;padding:1px 7px;border-radius:10px;font-size:0.7rem}
+.k-card{background:#0f1120;border:1px solid var(--border);border-radius:8px;padding:11px;margin-bottom:8px}
+.k-card .name{font-weight:600;font-size:0.85rem;color:#e2e8f0}
+.k-card .uni{font-size:0.75rem;color:#64748b;margin-top:2px}
+.k-card .meta{display:flex;gap:6px;margin-top:7px;align-items:center}
+
+/* Modal */
+.modal-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.7);z-index:200;align-items:center;justify-content:center}
+.modal-overlay.open{display:flex}
+.modal{background:#131625;border:1px solid var(--border);border-radius:12px;width:680px;max-width:95vw;max-height:90vh;overflow-y:auto}
+.modal-header{padding:18px 22px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between}
+.modal-header h2{font-size:1rem;font-weight:600}
+.modal-body{padding:22px}
+.modal-footer{padding:14px 22px;border-top:1px solid var(--border);display:flex;gap:10px;justify-content:flex-end}
+.close-btn{background:none;border:none;color:#64748b;cursor:pointer;font-size:1.2rem;line-height:1}
+.close-btn:hover{color:#e2e8f0}
+textarea{width:100%;background:#0f1120;border:1px solid var(--border);color:#e2e8f0;padding:12px;border-radius:8px;font-size:0.82rem;font-family:inherit;resize:vertical;outline:none;line-height:1.6}
+textarea:focus{border-color:var(--blue)}
+label{display:block;font-size:0.78rem;color:#64748b;margin-bottom:5px;margin-top:12px}
+input[type=text],input[type=email]{width:100%;background:#0f1120;border:1px solid var(--border);color:#e2e8f0;padding:8px 12px;border-radius:7px;font-size:0.82rem;outline:none}
+input[type=text]:focus,input[type=email]:focus{border-color:var(--blue)}
+
+/* Graph */
+.graph-wrap{background:var(--card2);border:1px solid var(--border);border-radius:10px;overflow:hidden}
+.graph-stats{padding:14px 18px;border-bottom:1px solid var(--border);display:flex;gap:20px;font-size:0.8rem;color:#64748b}
+.graph-stats span b{color:#e2e8f0}
+
+/* Section visibility */
+.section{display:none}.section.active{display:block}
+.empty{text-align:center;padding:48px;color:#334155;font-size:0.88rem}
+.spinner{display:inline-block;width:14px;height:14px;border:2px solid #334155;border-top-color:var(--blue);border-radius:50%;animation:spin .6s linear infinite;vertical-align:middle;margin-right:6px}
+@keyframes spin{to{transform:rotate(360deg)}}
+.toast{position:fixed;bottom:24px;right:24px;background:#131625;border:1px solid var(--border);border-radius:8px;padding:12px 18px;font-size:0.85rem;z-index:300;transform:translateY(80px);opacity:0;transition:all .3s}
+.toast.show{transform:translateY(0);opacity:1}
+.toast.success{border-color:var(--green);color:var(--green)}
+.toast.error{border-color:var(--red);color:var(--red)}
+</style>
+</head>
+<body>
+
+<header>
+  <h1>🎓 Professor Outreach <span>Dashboard</span></h1>
+  <div class="header-right">
+    <span class="badge" id="hdr-badge">Loading...</span>
+    <button class="btn btn-primary btn-sm" onclick="runDiscover()">⚡ Run Discover</button>
+  </div>
+</header>
+
+<div class="layout">
+  <nav>
+    <div class="nav-section">Overview</div>
+    <a class="active" onclick="showSection('professors')">📋 Professors</a>
+    <a onclick="showSection('kanban')">🗂 Kanban Board</a>
+    <a onclick="showSection('drafts')">✉️ Drafts</a>
+    <a onclick="showSection('graph')">🔗 Graph View</a>
+    <div class="nav-section">Actions</div>
+    <a onclick="runDiscover()">⚡ Discover Professors</a>
+    <a onclick="showSection('professors')">📤 Send Emails</a>
+    <div class="nav-section">Info</div>
+    <a href="/pipeline" target="_blank">🗺 Pipeline Diagram</a>
+  </nav>
+
+  <main>
+    <!-- Stats -->
+    <div class="stats" id="stats-row">
+      <div class="stat blue"><div class="n" id="s-total">—</div><div class="l">Total</div></div>
+      <div class="stat yellow"><div class="n" id="s-pending">—</div><div class="l">Pending</div></div>
+      <div class="stat blue"><div class="n" id="s-draft">—</div><div class="l">Draft Ready</div></div>
+      <div class="stat green"><div class="n" id="s-emailed">—</div><div class="l">Emailed</div></div>
+      <div class="stat purple"><div class="n" id="s-responded">—</div><div class="l">Responded</div></div>
+    </div>
+
+    <!-- Professors Table -->
+    <div class="section active" id="sec-professors">
+      <div class="toolbar">
+        <select id="f-country" onchange="loadProfessors()"><option value="">All Countries</option></select>
+        <select id="f-area" onchange="loadProfessors()"><option value="">All Areas</option></select>
+        <select id="f-status" onchange="loadProfessors()"><option value="">All Statuses</option></select>
+        <input type="number" id="f-score" placeholder="Min Score" style="width:100px" onchange="loadProfessors()">
+        <button class="btn btn-ghost" onclick="loadProfessors()">🔄 Refresh</button>
+      </div>
+      <div class="table-wrap">
+        <table>
+          <thead><tr>
+            <th>#</th><th>Name</th><th>University</th><th>Country</th>
+            <th>Score</th><th>Research Areas</th><th>Status</th><th>Actions</th>
+          </tr></thead>
+          <tbody id="prof-tbody"><tr><td colspan="8" class="empty">Loading...</td></tr></tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- Kanban -->
+    <div class="section" id="sec-kanban">
+      <div class="kanban" id="kanban-board"></div>
+    </div>
+
+    <!-- Drafts -->
+    <div class="section" id="sec-drafts">
+      <div class="toolbar">
+        <button class="btn btn-ghost" onclick="loadDrafts()">🔄 Refresh</button>
+      </div>
+      <div id="drafts-list"></div>
+    </div>
+
+    <!-- Graph -->
+    <div class="section" id="sec-graph">
+      <div class="graph-wrap">
+        <div class="graph-stats" id="graph-stats"></div>
+        <table>
+          <thead><tr><th>Subject</th><th>Relationship</th><th>Object</th></tr></thead>
+          <tbody id="graph-tbody"><tr><td colspan="3" class="empty">Loading graph...</td></tr></tbody>
+        </table>
+      </div>
+    </div>
+  </main>
+</div>
+
+<!-- Draft/Send Modal -->
+<div class="modal-overlay" id="modal">
+  <div class="modal">
+    <div class="modal-header">
+      <h2 id="modal-title">Email Draft</h2>
+      <button class="close-btn" onclick="closeModal()">✕</button>
+    </div>
+    <div class="modal-body">
+      <div id="modal-generating" style="display:none;color:#64748b;font-size:0.85rem">
+        <span class="spinner"></span> Generating with Groq/Llama...
+      </div>
+      <label>Subject</label>
+      <input type="text" id="modal-subject" value="Prospective Masters Student — Medical AI Research (SCDA/DDA, IELTS 7.0)">
+      <label>Recipient Email</label>
+      <input type="email" id="modal-email" placeholder="professor@university.edu">
+      <label>Email Body</label>
+      <textarea id="modal-body" rows="14" placeholder="Draft will appear here..."></textarea>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-ghost" onclick="closeModal()">Cancel</button>
+      <button class="btn btn-ghost" onclick="regenerateDraft()">🔄 Regenerate</button>
+      <button class="btn btn-success" onclick="sendEmail()">📤 Send Email</button>
+    </div>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+let currentProfIdx = null;
+let allProfessors = [];
+
+// ── Navigation ──────────────────────────────────────────────────────────────
+function showSection(name) {
+  document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
+  document.querySelectorAll('nav a').forEach(a => a.classList.remove('active'));
+  document.getElementById('sec-' + name).classList.add('active');
+  event.currentTarget.classList.add('active');
+  if (name === 'kanban') loadKanban();
+  if (name === 'drafts') loadDrafts();
+  if (name === 'graph') loadGraph();
+}
+
+// ── Toast ───────────────────────────────────────────────────────────────────
+function toast(msg, type='success') {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.className = `toast show ${type}`;
+  setTimeout(() => t.classList.remove('show'), 3000);
+}
+
+// ── Stats ───────────────────────────────────────────────────────────────────
+async function loadStats() {
+  const s = await fetch('/api/status').then(r => r.json());
+  document.getElementById('s-total').textContent = s.total || 0;
+  document.getElementById('s-pending').textContent = s.by_status?.['Pending'] || 0;
+  document.getElementById('s-draft').textContent = s.drafts_ready || 0;
+  document.getElementById('s-emailed').textContent = s.by_status?.['Emailed'] || 0;
+  document.getElementById('s-responded').textContent = s.by_status?.['Responded'] || 0;
+  document.getElementById('hdr-badge').textContent = `${s.total || 0} professors · ${s.emails_sent || 0} sent`;
+}
+
+// ── Filters ─────────────────────────────────────────────────────────────────
+async function loadFilters() {
+  const f = await fetch('/api/filters').then(r => r.json());
+  const cs = document.getElementById('f-country');
+  const as = document.getElementById('f-area');
+  const ss = document.getElementById('f-status');
+  f.countries.forEach(c => { const o = new Option(c, c); cs.add(o); });
+  f.areas.forEach(a => { const o = new Option(a, a); as.add(o); });
+  f.statuses.forEach(s => { const o = new Option(s, s); ss.add(o); });
+}
+
+// ── Professors Table ─────────────────────────────────────────────────────────
+function scoreClass(s) { return s >= 60 ? 'h' : s >= 30 ? 'm' : 'l'; }
+function statusClass(s) {
+  const m = {'Pending':'s-pending','Draft Ready':'s-draft','Emailed':'s-emailed','Responded':'s-responded','No Response':'s-no-response'};
+  return m[s] || 's-pending';
+}
+
+async function loadProfessors() {
+  const country = document.getElementById('f-country').value;
+  const area = document.getElementById('f-area').value;
+  const status = document.getElementById('f-status').value;
+  const score = document.getElementById('f-score').value;
+  let url = '/api/professors?';
+  if (country) url += `country=${encodeURIComponent(country)}&`;
+  if (area) url += `area=${encodeURIComponent(area)}&`;
+  if (status) url += `status=${encodeURIComponent(status)}&`;
+  if (score) url += `min_score=${score}&`;
+
+  allProfessors = await fetch(url).then(r => r.json());
+  const tbody = document.getElementById('prof-tbody');
+
+  if (!allProfessors.length) {
+    tbody.innerHTML = '<tr><td colspan="8" class="empty">No professors found. Run Discover first.</td></tr>';
+    return;
+  }
+
+  tbody.innerHTML = allProfessors.map((p, i) => `
+    <tr>
+      <td style="color:#475569">${i+1}</td>
+      <td><strong>${p.name}</strong>${p.last_contact ? `<br><span style="font-size:.7rem;color:#475569">Last: ${p.last_contact}</span>` : ''}</td>
+      <td style="color:#94a3b8">${p.institution || p.university || '—'}</td>
+      <td style="color:#94a3b8">${p.country || '—'}</td>
+      <td><span class="score ${scoreClass(p.match_score||0)}">${p.match_score || '—'}</span></td>
+      <td>${(p.research_keywords||[]).slice(0,3).map(k=>`<span class="tag">${k}</span>`).join('')}</td>
+      <td><span class="status-badge ${statusClass(p.status||'Pending')}">${p.status||'Pending'}</span></td>
+      <td style="white-space:nowrap">
+        <button class="btn btn-ghost btn-sm" onclick="openDraftModal(${i})">✉ Draft</button>
+        ${p.status==='Draft Ready' ? `<button class="btn btn-success btn-sm" style="margin-left:4px" onclick="openSendModal(${i})">📤 Send</button>` : ''}
+      </td>
+    </tr>`).join('');
+}
+
+// ── Modal ────────────────────────────────────────────────────────────────────
+async function openDraftModal(idx) {
+  currentProfIdx = idx;
+  const prof = allProfessors[idx];
+  document.getElementById('modal-title').textContent = `Draft — ${prof.name}`;
+  document.getElementById('modal-email').value = prof.email || '';
+  document.getElementById('modal-body').value = '';
+  document.getElementById('modal-generating').style.display = 'block';
+  document.getElementById('modal').classList.add('open');
+
+  try {
+    const res = await fetch(`/api/professors/${idx}/draft`, {method:'POST'});
+    const data = await res.json();
+    document.getElementById('modal-generating').style.display = 'none';
+    if (data.error) { toast(data.error, 'error'); return; }
+    document.getElementById('modal-body').value = data.draft;
+    loadProfessors(); loadStats();
+  } catch(e) {
+    document.getElementById('modal-generating').style.display = 'none';
+    toast('Failed to generate draft', 'error');
+  }
+}
+
+async function openSendModal(idx) {
+  currentProfIdx = idx;
+  const prof = allProfessors[idx];
+  document.getElementById('modal-title').textContent = `Send — ${prof.name}`;
+  document.getElementById('modal-email').value = prof.email || '';
+
+  // Load existing draft if available
+  if (prof.draft_file) {
+    const res = await fetch(`/api/drafts/${prof.draft_file}`);
+    const data = await res.json();
+    if (data.content) {
+      const body = data.content.split('---').slice(2).join('---').trim();
+      document.getElementById('modal-body').value = body;
+    }
+  }
+  document.getElementById('modal').classList.add('open');
+}
+
+async function regenerateDraft() {
+  if (currentProfIdx === null) return;
+  document.getElementById('modal-generating').style.display = 'block';
+  document.getElementById('modal-body').value = '';
+  const res = await fetch(`/api/professors/${currentProfIdx}/draft`, {method:'POST'});
+  const data = await res.json();
+  document.getElementById('modal-generating').style.display = 'none';
+  if (data.error) { toast(data.error, 'error'); return; }
+  document.getElementById('modal-body').value = data.draft;
+  toast('Draft regenerated');
+}
+
+async function sendEmail() {
+  const email = document.getElementById('modal-email').value;
+  const body = document.getElementById('modal-body').value;
+  const subject = document.getElementById('modal-subject').value;
+  if (!email || email.includes('[FILL')) { toast('Set professor email first', 'error'); return; }
+  if (!body.trim()) { toast('Draft is empty', 'error'); return; }
+
+  const res = await fetch(`/api/professors/${currentProfIdx}/send`, {
+    method: 'POST',
+    headers: {'Content-Type':'application/json'},
+    body: JSON.stringify({body, subject})
+  });
+  const data = await res.json();
+  if (data.error) { toast(data.error, 'error'); return; }
+  toast(`✓ Sent to ${data.sent_to}`);
+  closeModal();
+  loadProfessors(); loadStats();
+}
+
+function closeModal() {
+  document.getElementById('modal').classList.remove('open');
+  currentProfIdx = null;
+}
+
+// ── Kanban ───────────────────────────────────────────────────────────────────
+async function loadKanban() {
+  const profs = await fetch('/api/professors').then(r => r.json());
+  const cols = {
+    'Pending': {label:'📋 Pending', color:'#475569'},
+    'Draft Ready': {label:'✉️ Draft Ready', color:'#3b82f6'},
+    'Emailed': {label:'📤 Emailed', color:'#22c55e'},
+    'Responded': {label:'✅ Responded', color:'#a855f7'},
+    'No Response': {label:'⏳ No Response', color:'#ef4444'},
+  };
+  const buckets = {};
+  Object.keys(cols).forEach(k => buckets[k] = []);
+  profs.forEach(p => { const s = p.status||'Pending'; if(buckets[s]) buckets[s].push(p); else buckets['Pending'].push(p); });
+
+  document.getElementById('kanban-board').innerHTML = Object.entries(cols).map(([key, col]) => `
+    <div class="k-col">
+      <h3 style="color:${col.color}">${col.label} <span class="cnt">${buckets[key].length}</span></h3>
+      ${buckets[key].length ? buckets[key].map(p => `
+        <div class="k-card">
+          <div class="name">${p.name}</div>
+          <div class="uni">${p.institution||p.university||''} · ${p.country||''}</div>
+          <div class="meta">
+            ${p.match_score ? `<span class="score ${scoreClass(p.match_score)}">${p.match_score}</span>` : ''}
+            ${p.last_contact ? `<span style="font-size:.7rem;color:#475569">${p.last_contact}</span>` : ''}
+          </div>
+        </div>`).join('') : '<div style="color:#334155;font-size:.8rem;padding:8px">Empty</div>'}
+    </div>`).join('');
+}
+
+// ── Drafts ───────────────────────────────────────────────────────────────────
+async function loadDrafts() {
+  const drafts = await fetch('/api/drafts').then(r => r.json());
+  const el = document.getElementById('drafts-list');
+  if (!drafts.length) { el.innerHTML = '<div class="empty">No drafts yet. Generate from the Professors tab.</div>'; return; }
+  el.innerHTML = drafts.map(d => `
+    <div style="background:var(--card2);border:1px solid var(--border);border-radius:10px;margin-bottom:12px;overflow:hidden">
+      <div style="padding:12px 16px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between">
+        <strong style="font-size:.88rem">${d.filename}</strong>
+        <div style="display:flex;gap:8px">
+          <button class="btn btn-ghost btn-sm" onclick="editDraft('${d.filename}')">✏️ Edit</button>
+        </div>
+      </div>
+      <pre style="padding:16px;font-size:.78rem;color:#94a3b8;white-space:pre-wrap;font-family:inherit;max-height:200px;overflow-y:auto">${d.content}</pre>
+    </div>`).join('');
+}
+
+async function editDraft(filename) {
+  const res = await fetch(`/api/drafts/${filename}`);
+  const data = await res.json();
+  const newContent = prompt('Edit draft:', data.content);
+  if (newContent !== null) {
+    await fetch(`/api/drafts/${filename}`, {method:'PUT', headers:{'Content-Type':'application/json'}, body: JSON.stringify({content: newContent})});
+    toast('Draft saved'); loadDrafts();
+  }
+}
+
+// ── Graph ────────────────────────────────────────────────────────────────────
+async function loadGraph() {
+  const g = await fetch('/api/graph').then(r => r.json());
+  if (!g.triples) {
+    document.getElementById('graph-tbody').innerHTML = '<tr><td colspan="3" class="empty">No graph data. Run python main.py discover first.</td></tr>';
+    return;
+  }
+  const s = g.stats || {};
+  document.getElementById('graph-stats').innerHTML =
+    `<span><b>${s.total_professors||0}</b> professors</span><span><b>${s.total_triples||0}</b> relationships</span><span><b>${s.total_labs||0}</b> labs</span><span><b>${s.total_areas||0}</b> research areas</span>`;
+  document.getElementById('graph-tbody').innerHTML = (g.triples||[]).slice(0,300).map(t =>
+    `<tr><td>${t[0]}</td><td><span class="tag">${t[1]}</span></td><td>${t[2]}</td></tr>`).join('');
+}
+
+// ── Discover ─────────────────────────────────────────────────────────────────
+function runDiscover() {
+  toast('Run: python main.py discover — in your terminal');
+}
+
+// ── Init ─────────────────────────────────────────────────────────────────────
+loadStats();
+loadFilters();
+loadProfessors();
+</script>
+</body>
+</html>
