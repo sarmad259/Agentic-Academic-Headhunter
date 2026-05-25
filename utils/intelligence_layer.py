@@ -1,5 +1,44 @@
+import os
 from groq import Groq
 from typing import Dict, List
+
+GOLD_STANDARD_FOLDER = "gold_standard"
+
+
+def _load_gold_standard_examples(folder: str = GOLD_STANDARD_FOLDER, max_examples: int = 2) -> str:
+    """
+    Load up to `max_examples` approved email drafts from the gold_standard/ folder.
+    These are used as few-shot examples to self-improve the LLM drafts over time.
+    Returns an empty string (and never crashes) if the folder is empty or missing.
+    """
+    try:
+        if not os.path.exists(folder):
+            return ""
+        files = [f for f in os.listdir(folder) if f.endswith(".md")]
+        if not files:
+            return ""
+        examples = []
+        for fname in sorted(files)[:max_examples]:
+            with open(os.path.join(folder, fname), "r", encoding="utf-8") as fh:
+                content = fh.read()
+            # Extract only the email body (after ## Email Body header if present)
+            if "## Email Body" in content:
+                body = content.split("## Email Body")[-1].strip()
+                if "---" in body:
+                    body = body.split("---")[0].strip()
+            else:
+                body = content.strip()[:600]  # Fallback: first 600 chars
+            examples.append(f"[EXAMPLE EMAIL]\n{body}\n[END EXAMPLE]")
+        if not examples:
+            return ""
+        return (
+            "\n\nHIGH-QUALITY EXAMPLE EMAILS (study the tone, flow, and specificity):\n"
+            + "\n\n".join(examples)
+            + "\n\nMatch this tone and level of specificity in your email.\n"
+        )
+    except Exception:
+        return ""  # Silent fallback — never break the pipeline
+
 
 # Context map: professor research area → which of Sarmad's work to highlight
 CONTEXT_MAP = {
@@ -182,6 +221,7 @@ class IntelligenceLayer:
             "- NO generic phrases: 'my background aligns', 'I am writing to express'\n"
             "- Sound like a curious capable student making a genuine human request, not a salesperson\n"
             "- Email body ONLY, no subject line, no signature block"
+            + _load_gold_standard_examples()
         )
 
     def _pick_subject(self, angle: str) -> str:

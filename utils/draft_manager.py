@@ -49,10 +49,13 @@ class DraftManager:
         context = draft.get("context_used", "default")
         status = draft.get("status", "")
 
+        country = professor.get("country", "")
+
         content = f"""---
 Name: {name}
 Email: {email}
 Institution: {institution}
+Country: {country}
 Subject: {subject}
 Context: {context}
 Status: {status}

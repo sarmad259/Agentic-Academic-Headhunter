@@ -1,9 +1,50 @@
 import os
 import smtplib
+import time as _time
 from email.mime.text import MIMEText
 from email.mime.multipart import MIMEMultipart
 from typing import Dict
-from datetime import datetime
+from datetime import datetime, timedelta, timezone
+
+
+# Country → approximate UTC offset (hours) for send-time optimization
+COUNTRY_UTC_OFFSETS = {
+    "USA": -5, "Canada": -5, "UK": 0, "Germany": 1, "France": 1,
+    "Netherlands": 1, "Belgium": 1, "Switzerland": 1, "Austria": 1,
+    "Sweden": 1, "Denmark": 1, "Norway": 1, "Finland": 2, "Italy": 1,
+    "Spain": 1, "Poland": 1, "Czech Republic": 1, "Hungary": 1,
+    "Portugal": 0, "Turkey": 3, "Japan": 9, "China": 8, "South Korea": 9,
+    "Singapore": 8, "Hong Kong": 8, "Taiwan": 8, "Australia": 10,
+    "New Zealand": 12,
+}
+OPTIMAL_SEND_HOUR = 8   # 08:30 AM local professor time
+OPTIMAL_SEND_MIN  = 30
+
+
+def _wait_until_optimal_time(country: str) -> None:
+    """
+    Sleep until 08:30 AM in the professor's local timezone.
+    Falls back to sending immediately if the country is unknown or calculation fails.
+    """
+    try:
+        offset_hours = COUNTRY_UTC_OFFSETS.get(country)
+        if offset_hours is None:
+            return  # Unknown country → send immediately (safe fallback)
+
+        tz = timezone(timedelta(hours=offset_hours))
+        now = datetime.now(tz)
+        target = now.replace(hour=OPTIMAL_SEND_HOUR, minute=OPTIMAL_SEND_MIN,
+                             second=0, microsecond=0)
+        if now >= target:
+            target += timedelta(days=1)  # Already past window; send next morning
+
+        wait_seconds = (target - now).total_seconds()
+        if wait_seconds > 0:
+            wait_mins = int(wait_seconds / 60)
+            print(f"  ⏰ Timezone-aware send: waiting {wait_mins}m until 08:30 {country} time...")
+            _time.sleep(wait_seconds)
+    except Exception:
+        pass  # Silent fallback — never block the pipeline
 
 
 class EmailSender:
@@ -79,6 +120,10 @@ khansardarms@gmail.com | IELTS 7.0 | Available Oct 2026"""
                     continue
 
                 subject = metadata.get("subject", "Prospective Masters Student — AI Research (IELTS 7.0)")
+                country = metadata.get("country", "")
+
+                # Timezone-aware: wait until 08:30 AM professor's local time (fallback: send now)
+                _wait_until_optimal_time(country)
 
                 success = self.send_email(
                     recipient_email=email,

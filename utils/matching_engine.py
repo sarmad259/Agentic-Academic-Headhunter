@@ -1,6 +1,8 @@
+import os
+import re
 from typing import Dict, List
 
-# Sarmad's full profile for matching
+# Sarmad's full profile for matching — this is the hardcoded fallback baseline
 SARMAD_PROFILE = {
     "interests": [
         "medical image analysis", "diabetic retinopathy", "attention mechanisms",
@@ -40,11 +42,53 @@ SARMAD_PROFILE = {
 }
 
 
+def _load_portfolio_keywords(portfolio_path: str = "portfolio.md") -> Dict:
+    """
+    Dynamically read portfolio.md and extract extra skills/interests.
+    Returns a dict with 'interests' and 'skills' lists, or empty lists on failure.
+    Fallback: if file is missing or unreadable, returns empty lists silently.
+    """
+    extra = {"interests": [], "skills": []}
+    try:
+        if not os.path.exists(portfolio_path):
+            return extra
+        with open(portfolio_path, "r", encoding="utf-8") as f:
+            text = f.read().lower()
+
+        # Extract bullet-point lines and short noun phrases as keywords
+        lines = text.split("\n")
+        for line in lines:
+            line = line.strip().lstrip("*-># ")
+            if 2 < len(line) < 60 and not line.startswith("!"):
+                # Keep lines that look like skill/interest declarations
+                if any(kw in line for kw in [
+                    "learning", "ai", "model", "vision", "nlp", "detection",
+                    "attention", "rag", "llm", "medical", "neural", "deep",
+                    "transformer", "distil", "yolo", "segment", "transfer"
+                ]):
+                    extra["interests"].append(line)
+
+        # Deduplicate and trim
+        extra["interests"] = list(dict.fromkeys(extra["interests"]))[:20]
+    except Exception:
+        pass  # Silent fallback — never break the pipeline
+    return extra
+
+
+
+
 class MatchingEngine:
     """Scores professors against Sarmad's profile and ranks them."""
 
-    def __init__(self, student_profile: Dict = None):
-        self.profile = student_profile or SARMAD_PROFILE
+    def __init__(self, student_profile: Dict = None, portfolio_path: str = "portfolio.md"):
+        base = student_profile or SARMAD_PROFILE
+        # Dynamically enrich the profile with keywords from portfolio.md (with fallback)
+        extra = _load_portfolio_keywords(portfolio_path)
+        self.profile = {
+            **base,
+            "interests": list(dict.fromkeys(base["interests"] + extra["interests"])),
+            "skills":    list(dict.fromkeys(base["skills"]    + extra.get("skills", []))),
+        }
 
     def compute_match_score(self, professor: Dict) -> Dict:
         """
