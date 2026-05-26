@@ -6,7 +6,7 @@ An AI-powered system that personalizes and automates academic networking using a
 
 - **Profile Analysis**: Extracts skills, research interests, and projects from your resume and portfolio
 - **Research Agent**: Uses Semantic Scholar API to find professors' most cited recent papers
-- **Intelligence Layer**: Claude generates personalized emails linking your work to their research
+- **Intelligence Layer**: Groq generates personalized emails linking your work to their research
 - **Human-in-the-Loop**: Review and approve all drafts before sending
 - **Automated Sending**: Brevo API sends approved emails
 
@@ -24,7 +24,7 @@ professor-outreach/
 ├── utils/
 │   ├── profile_analyzer.py    # Extracts info from resume/portfolio
 │   ├── research_agent.py      # Semantic Scholar API integration
-│   ├── intelligence_layer.py  # Claude email generation
+│   ├── intelligence_layer.py  # Groq email generation
 │   ├── draft_manager.py       # Saves and organizes drafts
 │   └── email_sender.py        # Brevo email sending
 ├── drafts/               # Generated email drafts (review here)
@@ -49,7 +49,7 @@ cp .env.example .env
 ```
 
 Required variables:
-- `ANTHROPIC_API_KEY`: Get from https://console.anthropic.com/
+- `GROQ_API_KEY`: Get from https://console.groq.com/ (free tier available)
 - `BREVO_API_KEY`: Get from https://app.brevo.com/ (free tier available)
 - `SENDER_EMAIL`: Your email address
 - `SENDER_NAME`: Your name
@@ -92,7 +92,7 @@ This will:
 1. Analyze your resume and portfolio
 2. Research each professor via Semantic Scholar
 3. Find their 3 most cited papers from the last 24 months
-4. Generate personalized emails with Claude
+4. Generate personalized emails with Groq
 5. Save drafts to `/drafts` folder
 
 ### Phase 2: Review and Approve
@@ -128,7 +128,7 @@ Each email:
 ## API Information
 
 - **Semantic Scholar**: Free, no API key required
-- **Anthropic Claude**: Requires API key, pay-per-use
+- **Groq**: Free tier available with generous rate limits
 - **Brevo**: Free tier includes 300 emails/day
 
 ## Troubleshooting
